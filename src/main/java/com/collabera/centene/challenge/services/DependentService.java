@@ -17,6 +17,10 @@ public class DependentService {
 	@Autowired
 	DependentDAO depDAO;
 	
+	public ArrayList<Dependent> showDependents() throws SQLException {
+		return depDAO.showDependents();
+	}
+	
 	public Dependent findDependent(int id) throws SQLException {
 		return depDAO.findDependent(id);
 	}
@@ -29,8 +33,12 @@ public class DependentService {
 		return depDAO.addDependentToEnrollee(enrId, depId);
 	}
 	
-	public Dependent removeDependentFromEnrollee(int id) throws SQLException {
-		return depDAO.removeDependentFromEnrollee(id);
+	public Dependent removeDependentFromEnrollee(int depId, int enrId) throws SQLException {
+		return depDAO.removeDependentFromEnrollee(depId, enrId);
+	}
+	
+	public Dependent removeDependentFromAllEnrollees(int id) throws SQLException {
+		return depDAO.removeDependentFromAllEnrollees(id);
 	}
 	
 	public Dependent removeDependent(int id) throws SQLException {
@@ -41,7 +49,7 @@ public class DependentService {
 		return depDAO.addDependent(name, dob);
 	}
 	
-	public Dependent modifyDependent(int id, String name, Date dob) throws SQLException {
+	public ArrayList<Dependent> modifyDependent(int id, String name, Date dob) throws SQLException {
 		return depDAO.modifyDependent(id, name, dob);
 	}
 }

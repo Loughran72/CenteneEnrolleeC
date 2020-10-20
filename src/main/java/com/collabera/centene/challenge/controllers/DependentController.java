@@ -10,69 +10,67 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.collabera.centene.challenge.model.Dependent;
 import com.collabera.centene.challenge.services.DependentService;
 
-@Controller
+@RestController
 public class DependentController {
 
 	@Autowired
 	DependentService depService;
 	
-	@GetMapping("/findDependent/(id)")
-	public String findDependent(@PathVariable int id, ModelMap model) throws SQLException {
+	@GetMapping("/dependents/")
+	public ArrayList<Dependent> showDependents(ModelMap model) throws SQLException {
+		ArrayList<Dependent> depList = depService.showDependents();
+		return depList;
+	}
+	
+	@GetMapping("/finddependent/{id}")
+	public Dependent findDependent(@PathVariable int id, ModelMap model) throws SQLException {
 		Dependent dep = depService.findDependent(id);
-		
-		model.put("depdendent", dep);
-		return "dependent";
+		return dep;
 	}
 	
-	@GetMapping("/findDependents/(id)")
-	public String findDependents(@PathVariable int id, ModelMap model) throws SQLException {
-		ArrayList<Dependent> dep = depService.findDependents(id);
-		
-		model.put("depdendents", dep);
-		return "dependents";
+	@GetMapping("/finddependents/{id}")
+	public ArrayList<Dependent> findDependents(@PathVariable int id, ModelMap model) throws SQLException {
+		ArrayList<Dependent> deps = depService.findDependents(id);
+		return deps;
 	}
 	
-	@GetMapping("/addDependentToEnrollee/(enrId, depId)")
-	public String addDependentToEnrollee(int enrId, int depId, ModelMap model) throws SQLException {
+	@GetMapping("/adddependenttodnrollee/{enrId}/{depId}")
+	public Dependent addDependentToEnrollee(@PathVariable(value="enrId") int enrId, @PathVariable(value="depId") int depId, ModelMap model) throws SQLException {
 		Dependent dep = depService.addDependentToEnrollee(enrId, depId);
-		
-		model.put("depdendent", dep);
-		return "dependent";
+		return dep;
 	}
 	
-	@GetMapping("/removeDependentFromEnrollee/(id)")
-	public String removeDependentFromEnrollee(int id, ModelMap model) throws SQLException {
-		Dependent dep = depService.removeDependentFromEnrollee(id);
-		
-		model.put("depdendent", dep);
-		return "dependent";
+	@GetMapping("/removedepfromenr/{depId}/{enrId}")
+	public Dependent removeDependentFromEnrollee(@PathVariable(value="depId") int depId, @PathVariable(value="enrId") int enrId, ModelMap model) throws SQLException {
+		return depService.removeDependentFromEnrollee(depId, enrId);
 	}
 	
-	@GetMapping("/removeDependent/(id)")
-	public String removeDependent(int id, ModelMap model) throws SQLException {
+	@GetMapping("/removedepfromallenrs/{id}/")
+	public Dependent removeDependentFromAllEnrollees(@PathVariable int id, ModelMap model) throws SQLException {
+		Dependent dep = depService.removeDependentFromAllEnrollees(id);
+		return dep;
+	}
+	
+	@GetMapping("/removedependent/{id}")
+	public Dependent removeDependent(@PathVariable int id, ModelMap model) throws SQLException {
 		Dependent dep = depService.removeDependent(id);
-		
-		model.put("depdendent", dep);
-		return "dependent";
+		return dep;
 	}
 	
-	@GetMapping("/addDependent/(name, dob)")
-	public String addDependent(String name, Date dob, ModelMap model) throws SQLException {
+	@GetMapping("/adddependent/{name}/{dob}")
+	public Dependent addDependent(@PathVariable(value="name") String name, @PathVariable(value="dob") Date dob, ModelMap model) throws SQLException {
 		Dependent dep = depService.addDependent(name, dob);
-		
-		model.put("depdendent", dep);
-		return "dependent";
+		return dep;
 	}
 	
-	@GetMapping("/modifyDependent/(id, name, dob)")
-	public String modifyDependent(int id, String name, Date dob, ModelMap model) throws SQLException {
-		Dependent dep = depService.modifyDependent(id, name, dob);
-		
-		model.put("depdendent", dep);
-		return "dependent";
+	@GetMapping("/modifydependent/{id}/{name}/{dob}")
+	public ArrayList<Dependent> modifyDependent(@PathVariable(value="id") int id, @PathVariable(value="name") String name, @PathVariable(value="dob") Date dob, ModelMap model) throws SQLException {
+		ArrayList<Dependent> modDepList = depService.modifyDependent(id, name, dob);
+		return modDepList;
 	}
 }

@@ -28,43 +28,52 @@ public class EnrolleeController {
 	@GetMapping("/enrollees/")
 	public ArrayList<Enrollee> showEnrollees(ModelMap model) throws SQLException {
 		ArrayList<Enrollee> enrList = enrService.showEnrollees();
-//		ArrayList<Dependent> deps = depService.findDependents(id);
-		
-//		model.put("enr", enrList);
-//		model.put("deps", deps);
-//		return "enrollees";
 		return enrList;
 	}
 	
 	@GetMapping("/findenrollee/{id}")
 	public Enrollee findEnrollee(@PathVariable int id, ModelMap model) throws SQLException {
 		Enrollee enr = enrService.findEnrollee(id);
-//		ArrayList<Dependent> deps = depService.findDependents(id);
-		
-		
-//		model.put("enr", enr);
-//		model.put("deps", deps);
-//		return "enrollee";
 		return enr;
+	}
+	
+	@GetMapping("/findenrwithdeps/{id}")
+	public ArrayList<Object> findEnrWithDeps(@PathVariable int id, ModelMap model) throws SQLException {
+		ArrayList<Object> enrWithDeps = new ArrayList<Object>();
+		enrWithDeps.add(enrService.findEnrollee(id));
+		enrWithDeps.add(depService.findDependents(id));
+		return enrWithDeps;
+	}
+	
+	@GetMapping("/findenrswithdeps/")
+	public ArrayList<Object> showEnrsWithDeps(ModelMap model) throws SQLException {
+		ArrayList<Object> enrWithDeps = new ArrayList<Object>();
+		ArrayList<Enrollee> enrList = enrService.showEnrollees();
+		for(int count=0; count<enrList.size(); count++) {
+			enrWithDeps.add(enrList.get(count));
+			enrWithDeps.add(depService.findDependents(enrList.get(count).getId() ));
+		}
+		return enrWithDeps;
+	}
+	
+	@GetMapping("/adddeptoallenrs/{id}")
+	public Dependent addDependentToAllEnrollees(@PathVariable int id, ModelMap model) throws SQLException {
+		ArrayList<Enrollee> enrList = enrService.showEnrollees();
+		for(int count=0; count<enrList.size(); count++) {
+			depService.addDependentToEnrollee(enrList.get(count).getId(), id);
+		}
+		return depService.findDependent(id);
 	}
 	
 	@GetMapping("/activeenrollees")
 	public ArrayList<Enrollee> findActiveEnrollees(ModelMap model) throws SQLException {
 		ArrayList<Enrollee> actEnr = enrService.findActiveEnrollees();
-//		depSort(actEnr, model);
-		
-//		model.put("actEnr", actEnr);
-//		return "ActiveEnrollees";
 		return actEnr;
 	}
 	
 	@GetMapping("/inactiveenrollees")
 	public ArrayList<Enrollee> findInactiveEnrollees(ModelMap model) throws SQLException {
 		ArrayList<Enrollee> inactEnr = enrService.findInactiveEnrollees();
-//		depSort(inactEnr, model);
-		
-//		model.put("inactEnr", inactEnr);
-//		return "InactiveEnrollees";
 		return inactEnr;
 	}
 	
@@ -72,34 +81,24 @@ public class EnrolleeController {
 		for(int i=0; i<listEnr.size(); i++) {
 			int id = listEnr.get(i).getId();
 			ArrayList<Dependent> deps = depService.findDependents(id);
-//			model.put("deps", deps);
 		}
 	}
 	
 	@GetMapping("/removeenrollee/{id}")
 	public Enrollee removeEnrollee(@PathVariable int id, ModelMap model) throws SQLException {
 		Enrollee remEnr = enrService.removeEnrollee(id);
-		
-//		model.put("enr", remEnr);
-//		return "removeEnrollee";
 		return remEnr;
 	}
 	
 	@GetMapping("/addenrollee/{name}/{status}/{dob}/{phoneNum}")
 	public Enrollee addEnrollee(@PathVariable(value="name") String name, @PathVariable(value="status") int status, @PathVariable(value="dob") Date dob, @PathVariable(value="phoneNum") String phoneNum, ModelMap model) throws SQLException {
 		Enrollee addEnr = enrService.addEnrollee(name, status, dob, phoneNum);
-		
-//		model.put("enr", addEnr);
-//		return "removeEnrollee";
 		return addEnr;
 	}
 	
 	@GetMapping("/modifyenrollee/{id}/{name}/{status}/{dob}/{phoneNum}")
-	public Enrollee modifyEnrollee(@PathVariable(value="id") int id, @PathVariable(value="name") String name, @PathVariable(value="status") int status, @PathVariable(value="dob") Date dob, @PathVariable(value="phoneNum") String phoneNum, ModelMap model) throws SQLException {
-		Enrollee modEnr = enrService.modifyEnrollee(id, name, status, dob, phoneNum);
-		
-//		model.put("enr", modEnr);
-//		return "removeEnrollee";
-		return modEnr;
+	public ArrayList<Enrollee> modifyEnrollee(@PathVariable(value="id") int id, @PathVariable(value="name") String name, @PathVariable(value="status") int status, @PathVariable(value="dob") Date dob, @PathVariable(value="phoneNum") String phoneNum, ModelMap model) throws SQLException {
+		ArrayList<Enrollee> modEnrList = enrService.modifyEnrollee(id, name, status, dob, phoneNum);
+		return modEnrList;
 	}
 }

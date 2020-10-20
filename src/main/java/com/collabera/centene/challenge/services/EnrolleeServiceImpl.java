@@ -40,7 +40,7 @@ public class EnrolleeServiceImpl {
 		return enrolleeDAO.addEnrollee(name, status, dob, phoneNum);
 	}
 	
-	public Enrollee modifyEnrollee(int id, String name, int status, Date dob, String phoneNum) throws SQLException {
+	public ArrayList<Enrollee> modifyEnrollee(int id, String name, int status, Date dob, String phoneNum) throws SQLException {
 		return enrolleeDAO.modifyEnrollee(id, name, status, dob, phoneNum);
 	}
 

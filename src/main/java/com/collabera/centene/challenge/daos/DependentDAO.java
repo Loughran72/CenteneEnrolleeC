@@ -3,6 +3,7 @@ package com.collabera.centene.challenge.daos;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class DependentDAO {
 	
 	public ArrayList<Dependent> showDependents() throws SQLException {
 		conn = CenteneEnrolleeApplication.connMgr.getConnection();
-		cStmt = conn.prepareCall("(SELECT * FROM dependents)");
+		cStmt = conn.prepareCall("(SELECT * FROM centene.dependents)");
 		resSet = cStmt.executeQuery();
 		
 		ArrayList<Dependent> listDep = new ArrayList<Dependent>();
@@ -37,16 +38,16 @@ public class DependentDAO {
 	
 	public Dependent findDependent(int id) throws SQLException {
 		conn = CenteneEnrolleeApplication.connMgr.getConnection();
-		cStmt = conn.prepareCall("(call findDependent(?))");
+		cStmt = conn.prepareCall("SELECT * FROM centene.dependents WHERE dependents.id = ?;");
 		cStmt.setInt(1, id);
 		resSet = cStmt.executeQuery();
-		
+		resSet.next();
 		return populateDependent(resSet);
 	}
 	
 	public ArrayList<Dependent> findDependents(int id) throws SQLException {
 		conn = CenteneEnrolleeApplication.connMgr.getConnection();
-		cStmt = conn.prepareCall("(call findDependents(?))");
+		cStmt = conn.prepareCall("call findDependents(?);");
 		cStmt.setInt(1, id);
 		resSet = cStmt.executeQuery();
 		
@@ -61,19 +62,30 @@ public class DependentDAO {
 	
 	public Dependent addDependentToEnrollee(int enrId, int depId) throws SQLException {
 		conn = CenteneEnrolleeApplication.connMgr.getConnection();
-		cStmt = conn.prepareCall("(call addDependentToEnrollee(?, ?))");
+		cStmt = conn.prepareCall("call addDependentToEnrollee(?, ?);");
 		cStmt.setInt(1, enrId);
 		cStmt.setInt(2, depId);
-		resSet = cStmt.executeQuery();
-		return populateDependent(resSet);
+		cStmt.executeUpdate();
+		return findDependent(depId);
 	}
 	
-	public Dependent removeDependentFromEnrollee(int id) throws SQLException {
+	public Dependent removeDependentFromEnrollee(int depId, int enrId) throws SQLException {
+		Dependent dep = findDependent(depId);
 		conn = CenteneEnrolleeApplication.connMgr.getConnection();
-		cStmt = conn.prepareCall("(call removeDependentFromEnrollee(?))");
+		cStmt = conn.prepareCall("call removeDependentFromEnrollee(?, ?);");
+		cStmt.setInt(1, depId);
+		cStmt.setInt(2, enrId);
+		cStmt.executeUpdate();
+		return dep;
+	}
+	
+	public Dependent removeDependentFromAllEnrollees(int id) throws SQLException {
+		Dependent dep = findDependent(id);
+		conn = CenteneEnrolleeApplication.connMgr.getConnection();
+		cStmt = conn.prepareCall("call removeDependentFromAllEnrollees(?);");
 		cStmt.setInt(1, id);
-		resSet = cStmt.executeQuery();
-		return populateDependent(resSet);
+		cStmt.executeUpdate();
+		return dep;
 	}
 	
 	private Dependent populateDependent(ResultSet resSet) throws SQLException {
@@ -85,29 +97,36 @@ public class DependentDAO {
 	}
 	
 	public Dependent removeDependent(int id) throws SQLException {
+		Dependent remDep = findDependent(id);
 		conn = CenteneEnrolleeApplication.connMgr.getConnection();
-		cStmt = conn.prepareCall("(call removeDependent(?))");
+		cStmt = conn.prepareCall("call removeDependent(?);");
 		cStmt.setInt(1, id);
-		resSet = cStmt.executeQuery();
-		return populateDependent(resSet);
+		cStmt.executeUpdate();
+		return remDep;
 	}
 	
 	public Dependent addDependent(String name, Date dob) throws SQLException {
 		conn = CenteneEnrolleeApplication.connMgr.getConnection();
-		cStmt = conn.prepareCall("(call addDependent(?, ?))");
+		cStmt = conn.prepareCall("call addDependent(?, ?);");
 		cStmt.setString(1, name);
 		cStmt.setDate(2, dob);
+		cStmt.executeUpdate();
+		cStmt = conn.prepareCall("(SELECT * FROM dependents WHERE dependents.id = LAST_INSERT_ID())");
 		resSet = cStmt.executeQuery();
+		resSet.next();
 		return populateDependent(resSet);
 	}
 	
-	public Dependent modifyDependent(int id, String name, Date dob) throws SQLException {
+	public ArrayList<Dependent> modifyDependent(int id, String name, Date dob) throws SQLException {
+		ArrayList<Dependent> depList = new ArrayList<Dependent>();
+		depList.add(findDependent(id));
 		conn = CenteneEnrolleeApplication.connMgr.getConnection();
-		cStmt = conn.prepareCall("(call modifyDependent(?, ?, ?))");
+		cStmt = conn.prepareCall("call modifyDependent(?, ?, ?);");
 		cStmt.setInt(1, id);
 		cStmt.setString(2, name);
 		cStmt.setDate(3, dob);
-		resSet = cStmt.executeQuery();
-		return populateDependent(resSet);
+		cStmt.executeUpdate();
+		depList.add(findDependent(id));
+		return depList;
 	}
 }

@@ -20,5 +20,5 @@ public interface EnrolleeService {
 	
 	public Enrollee addEnrollee(String name, int status, Date dob, String phoneNum);
 	
-	public Enrollee modifyEnrollee(int id, String name, int status, Date dob, String phoneNum);
+	public ArrayList<Enrollee> modifyEnrollee(int id, String name, int status, Date dob, String phoneNum);
 	}
